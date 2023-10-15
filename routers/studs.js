@@ -1,30 +1,41 @@
 const exp1 = require('express');
-const mong1 = require('mongoose');
-const students = require('../models/students');
+const model = require('../models/students');
 
 const router1 = exp1.Router();
 
-// post
+// POST
 router1.post('/', async (req, res) => {
   const { name, phone, age, email } = req.body;
-  let student = await students.find({ email });
 
-  if (student) return res.send('You are already registered');
+  const existingStudent = await model.findOne({ email });
 
-  student = new students({
+  if (existingStudent) {
+    return res
+      .status(400)
+      .send('A Student with this email is already registered');
+  }
+
+  // Create a new student document
+  const student = new model({
     name,
     phone,
     age,
     email,
   });
-  await student.save();
-  res.send(student).status(201);
+
+  // Save the new student to the database
+  try {
+    const savedStudent = await student.save();
+    res.status(200).json(savedStudent);
+  } catch (error) {
+    res.status(500).send('An unknown error occurred while saving the student');
+  }
 });
 
 // get
 router1.get('/', async (req, res) => {
-  const studs1 = await students.find();
-  res.send(studs1);
+  const stgetall = await model.find();
+  res.send(stgetall);
 });
 
 module.exports = router1;
