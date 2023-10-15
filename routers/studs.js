@@ -5,7 +5,7 @@ const students = require('../models/students');
 const router1 = exp1.Router();
 
 // post
-router1.post('/api/studs', async (req, res) => {
+router1.post('/', async (req, res) => {
   const { name, phone, age, email } = req.body;
   let student = await students.find({ email });
 
